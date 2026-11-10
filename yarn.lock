@@ -1102,7 +1102,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/k6@npm:1.7.0, @types/k6@npm:^1.0.0":
+"@types/k6@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@types/k6@npm:2.3.1"
+  checksum: 10c0/aee00f8ccf13c93faf0e9f9e0df9c7ea65bb2d6312d5f570af335b68058338303fb613cbd9c7ba3f419d6e34545e11b550d296a62a87f31d7b2afcb01c915e50
+  languageName: node
+  linkType: hard
+
+"@types/k6@npm:^1.0.0":
   version: 1.7.0
   resolution: "@types/k6@npm:1.7.0"
   checksum: 10c0/d8de78a7f90acf3906cf8414dc88eba181cea8768b6cb4096fad24f8efd3eb6def8f8d119f3416406cb0e7691c1ef8853abe26ffe6814bd331d3e048fa85d189
@@ -2838,7 +2845,7 @@ __metadata:
     "@biomejs/biome": "npm:2.6.6"
     "@grafana/openapi-to-k6": "npm:0.4.1"
     "@j178/prek": "npm:0.5.10"
-    "@types/k6": "npm:1.7.0"
+    "@types/k6": "npm:2.3.1"
     typescript: "npm:7.0.2"
   languageName: unknown
   linkType: soft
