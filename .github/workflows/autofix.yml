@@ -58,6 +58,11 @@ jobs:
         with:
           path: ~/.cache/prek
           key: prek-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('prek.toml') }}
+          # gitleaks is a `language: golang` hook, so a cold miss downloads a Go
+          # toolchain and builds it from source. Reuse the last cache on a prek.toml
+          # edit and let prek install only what changed.
+          restore-keys: |
+            prek-${{ runner.os }}-${{ runner.arch }}-
       # ADAPT: toolchains for local hooks go here, installed from lockfiles or exact pins.
       # See the playbook's "Toolchains" section (Node, packer, the project environment).
       - name: Tree is clean before hooks run
@@ -77,8 +82,9 @@ jobs:
       - name: Secret scan of the commits this pull request adds
         id: gitleaks-pr
         if: github.event_name == 'pull_request'
-        # The commit-time `gitleaks` hook scans staged changes only, so it sees nothing here.
-        run: prek run --hook-stage manual --all-files gitleaks-pr --color=always
+        # The passes above scan the working tree via gitleaks-tree; this catches a secret
+        # that was committed and then deleted, which no tree scan can see.
+        run: prek run --stage manual --all-files gitleaks-pr --color=always
       - name: Default branch has no fixable drift
         id: no-drift
         if: github.event_name != 'pull_request'

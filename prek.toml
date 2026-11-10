@@ -23,15 +23,27 @@ rev = "v0.11.0.1-1"
 hooks = [{ id = "shellcheck", args = ["--severity=warning"] }]
 
 # ── Secrets: gitleaks ─────────────────────────────────────────────────────────
-# `gitleaks` scans staged changes only, so it checks nothing once the work is
-# committed (CI, `prek run --all-files`). `gitleaks-pr` is the CI counterpart:
-# manual stage, so `prek run --all-files` and the commit hook skip it, and the
-# autofix workflow runs it explicitly over the commits the pull request adds.
-# `--pre-commit=false` and `--staged=false` cancel the flags in the hook's entry
-# (the last occurrence wins); with either left on, gitleaks ignores --log-opts
-# and scans nothing. It needs origin/main and full history, which the workflow
-# fetches. Both modes read git, so node_modules/ and the gitignored credentials
-# under learn/data/ are never scanned.
+# Three registrations of one hook, because each covers a gap the others leave.
+# Scope and exclusions live in .gitleaks.toml; see the header there.
+#
+# `gitleaks` reads the staged index, which is what a commit is about to add. It
+# is empty under `prek run --all-files`, where this hook passes having scanned
+# nothing, so the two below carry the weight everywhere except a commit.
+#
+# `gitleaks-tree` reads the working tree, so `prek run --all-files` scans real
+# bytes — locally, in the autofix passes, and on a push to the default branch,
+# where the pull-request step does not run. This is the whole-file coverage
+# detect-secrets provided.
+#
+# `gitleaks-pr` reads the commits a pull request adds, catching a secret that
+# was committed and then deleted, which no tree scan can see. Manual stage, so
+# the commit hook and `--all-files` skip it and the workflow invokes it. It
+# needs origin/main and full history, which the workflow fetches.
+#
+# `--pre-commit=false` and `--staged=false` cancel the flags baked into the
+# hook's entry, since the last occurrence wins. Both are required: cmd/git.go
+# branches on `if preCommit || staged` into a diff scan that never reads
+# --log-opts.
 
 [[repos]]
 repo = "https://github.com/gitleaks/gitleaks"
@@ -39,6 +51,12 @@ rev = "v8.30.1"
 
 [[repos.hooks]]
 id = "gitleaks"
+
+[[repos.hooks]]
+id = "gitleaks"
+alias = "gitleaks-tree"
+name = "Detect hardcoded secrets in the working tree"
+entry = "gitleaks dir . --redact --no-banner --verbose"
 
 [[repos.hooks]]
 id = "gitleaks"
