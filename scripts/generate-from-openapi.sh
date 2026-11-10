@@ -18,10 +18,17 @@ LEARN_API_BASE_URL="${LEARN_API_BASE_URL:-https://api.learn.mit.edu}"
 # `k6 x openapi` is a subcommand extension, so generating needs a k6 built with
 # it. Only generating does: the client written below is plain TypeScript that
 # runs on a stock k6.
+#
+# This pin is in a shell script rather than a lockfile, so no language manager
+# sees it. The annotation below is what the customManagers block in
+# renovate.json matches, so a new release still opens a pull request.
+# renovate: datasource=github-releases depName=grafana/xk6-subcommand-openapi
 XK6_OPENAPI_VERSION=v0.1.0
 
 # The release publishes no checksum file, so these digests come from the GitHub
-# API. Refresh them alongside the version:
+# API. Renovate can bump the version above but cannot compute these, so a
+# version bump lands with four stale digests and the next run of this script
+# stops at the mismatch below. Refresh all four from the bumped version:
 #   gh api repos/grafana/xk6-subcommand-openapi/releases/tags/${XK6_OPENAPI_VERSION} \
 #     --jq '.assets[] | "\(.name) \(.digest | sub("^sha256:"; ""))"'
 # The API prefixes each digest with `sha256:`; the comparison below is against
@@ -74,6 +81,7 @@ if [[ ! -x ${K6} ]]; then
 
 	ACTUAL=$(sha256_of "${ARCHIVE}")
 	if [[ ${ACTUAL} != "${SHA256}" ]]; then
+		rm -f "${ARCHIVE}"
 		echo "Checksum mismatch for ${ARCHIVE}: expected ${SHA256}, got ${ACTUAL}." >&2
 		exit 1
 	fi

@@ -1,4 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>mitodl/.github:renovate-config"]
+  "extends": ["local>mitodl/.github:renovate-config"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "The k6 openapi generator is pinned in the generator script, not in a lockfile, so no language manager sees it",
+      "fileMatch": ["(^|/)scripts/generate-from-openapi\\.sh$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>\\S+?)\\s+XK6_OPENAPI_VERSION=(?<currentValue>\\S+)"
+      ]
+    }
+  ]
 }
