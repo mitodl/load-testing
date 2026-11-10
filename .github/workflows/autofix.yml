@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false # ADAPT: private repositories delete this block (contract §3.1)
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: "24.22.2" # ADAPT: use node-version-file if the repository pins Node
+          node-version: "26.13.0" # ADAPT: use node-version-file if the repository pins Node
       # Cache the package manager's download cache, not node_modules. Yarn checks each
       # cached archive against its checksum in yarn.lock and fails the install on a
       # mismatch (YN0018). A pull_request run saves only to its own ref, and restores its
