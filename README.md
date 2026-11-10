@@ -30,12 +30,12 @@ k6 archive learn/learn.smoke.ts
 
 **The numbers for average-load and stress should be revisited over time.**
 
-| Script | Purpose |
-| --- | --- |
-| `learn/learn.smoke.ts` | Lightweight smoke testing of deployments (4 users) |
-| `learn/learn.average-load.ts` | An average amount of user load (100 users) |
-| `learn/learn.stress.ts` | A stressful amount of user load (200 users) |
-| `learn/channels.compare.ts` | Per-endpoint timings for the channels API, for comparing two runs |
+| Script                        | Purpose                                                           |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `learn/learn.smoke.ts`        | Lightweight smoke testing of deployments (4 users)                |
+| `learn/learn.average-load.ts` | An average amount of user load (100 users)                        |
+| `learn/learn.stress.ts`       | A stressful amount of user load (200 users)                       |
+| `learn/channels.compare.ts`   | Per-endpoint timings for the channels API, for comparing two runs |
 
 Each of the first three splits its virtual users evenly between a backend API
 scenario and a browser scenario driving the frontend.
@@ -44,14 +44,14 @@ scenario and a browser scenario driving the frontend.
 
 **For base URLs, include the port number if you reach the service through one.**
 
-| Name | Description | Example |
-| --- | --- | --- |
-| `BACKEND_BASE_URL` | Base URL of the backend API service. | `https://api.learn.odl.local` |
-| `FRONTEND_BASE_URL` | Base URL of the frontend service. | `https://learn.odl.local` |
-| `SSO_BASE_URL` | Base URL of the Keycloak service. | `https://keycloak.odl.local` |
-| `IGNORE_HTTPS_ERRORS` | Ignore HTTPS certificate errors. Only for local test certificates. | `true` |
-| `USERS_JSON_FILE` | Credentials for the browser login journey, as `[{"email": "<EMAIL>", "password": "<PASSWORD>"}, ...]`. Resolved relative to the script, so put it under `learn/data/`, which is gitignored. | `data/users.json` |
-| `AUTH_ACCESS_TOKEN` | Bearer token for the backend API scenario. Without it, authenticated API checks are skipped. | |
+| Name                  | Description                                                                                                                                                                                 | Example                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `BACKEND_BASE_URL`    | Base URL of the backend API service.                                                                                                                                                        | `https://api.learn.odl.local` |
+| `FRONTEND_BASE_URL`   | Base URL of the frontend service.                                                                                                                                                           | `https://learn.odl.local`     |
+| `SSO_BASE_URL`        | Base URL of the Keycloak service.                                                                                                                                                           | `https://keycloak.odl.local`  |
+| `IGNORE_HTTPS_ERRORS` | Ignore HTTPS certificate errors. Only for local test certificates.                                                                                                                          | `true`                        |
+| `USERS_JSON_FILE`     | Credentials for the browser login journey, as `[{"email": "<EMAIL>", "password": "<PASSWORD>"}, ...]`. Resolved relative to the script, so put it under `learn/data/`, which is gitignored. | `data/users.json`             |
+| `AUTH_ACCESS_TOKEN`   | Bearer token for the backend API scenario. Without it, authenticated API checks are skipped.                                                                                                |                               |
 
 `channels.compare.ts` additionally takes `VUS` (default `15`), `DURATION`
 (default `3m`), `RUN_LABEL` (default `run`, names the output file) and
