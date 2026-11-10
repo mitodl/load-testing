@@ -24,7 +24,8 @@ hooks = [{ id = "shellcheck", args = ["--severity=warning"] }]
 
 # ── Secrets: gitleaks ─────────────────────────────────────────────────────────
 # Three registrations of one hook, because each covers a gap the others leave.
-# Scope and exclusions live in .gitleaks.toml; see the header there.
+# Exclusions live in .gitleaks.toml, plus .gitleaks-tree.toml for the one hook
+# that reads the filesystem instead of git; see the headers there.
 #
 # `gitleaks` reads the staged index, which is what a commit is about to add. It
 # is empty under `prek run --all-files`, where this hook passes having scanned
@@ -56,7 +57,7 @@ id = "gitleaks"
 id = "gitleaks"
 alias = "gitleaks-tree"
 name = "Detect hardcoded secrets in the working tree"
-entry = "gitleaks dir . --redact --no-banner --verbose"
+entry = "gitleaks dir . --config .gitleaks-tree.toml --redact --no-banner --verbose"
 
 [[repos.hooks]]
 id = "gitleaks"
