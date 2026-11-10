@@ -83,9 +83,10 @@ skips or approximates, and exits 0 anyway. Against production it currently warns
 twice about `/api/v1/contentfiles/`, whose path parameters the schema declares
 incompletely; no operation the tests call is affected.
 
-Every generated method is `async`, so each call site `await`s it and tags its
-request with `endpoint` rather than nesting it in a k6 `group()`, which rejects
-an async callback unless k6 runs with `--features async-metric-context`.
+Every generated method is `async`, so each call site `await`s it and tags both
+its request and its check with `endpoint` rather than nesting them in a k6
+`group()`, which rejects an async callback unless k6 runs with
+`--features async-metric-context`.
 
 ## Development
 

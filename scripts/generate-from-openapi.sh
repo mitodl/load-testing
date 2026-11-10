@@ -23,7 +23,9 @@ XK6_OPENAPI_VERSION=v0.1.0
 # The release publishes no checksum file, so these digests come from the GitHub
 # API. Refresh them alongside the version:
 #   gh api repos/grafana/xk6-subcommand-openapi/releases/tags/${XK6_OPENAPI_VERSION} \
-#     --jq '.assets[] | "\(.name) \(.digest)"'
+#     --jq '.assets[] | "\(.name) \(.digest | sub("^sha256:"; ""))"'
+# The API prefixes each digest with `sha256:`; the comparison below is against
+# bare hex, so the prefix has to come off.
 case "$(uname -s)-$(uname -m)" in
 Linux-x86_64)
 	PLATFORM=linux_amd64
@@ -66,7 +68,9 @@ if [[ ! -x ${K6} ]]; then
 
 	mkdir -p "${CACHE_DIR}"
 	echo "Fetching ${URL}"
-	curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
+	curl --fail --silent --show-error --location \
+		--proto '=https' --proto-redir '=https' \
+		--output "${ARCHIVE}" "${URL}"
 
 	ACTUAL=$(sha256_of "${ARCHIVE}")
 	if [[ ${ACTUAL} != "${SHA256}" ]]; then
