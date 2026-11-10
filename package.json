@@ -1,16 +1,26 @@
 {
-  "name": "mit-learn-load-testing",
+  "name": "load-testing",
   "version": "1.0.0",
-  "description": "",
-  "main": "learn.js",
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@grafana/openapi-to-k6": "^0.4.1",
-    "@types/k6": "^1.7.0"
+  "description": "k6 load tests for MIT Open Learning properties",
+  "repository": "https://github.com/mitodl/load-testing.git",
+  "license": "BSD-3-Clause",
+  "private": true,
+  "engines": {
+    "node": "^24.0.0",
+    "yarn": "^4.1.1"
   },
-  "overrides": {
-    "@asyncapi/specs": "6.11.1"
+  "packageManager": "yarn@4.12.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check",
+    "lint-fix": "biome check --write",
+    "generate-clients": "./scripts/generate-from-openapi.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
+    "@grafana/openapi-to-k6": "^0.4.1",
+    "@types/k6": "^1.7.0",
+    "typescript": "^5.9.3"
   },
   "resolutions": {
     "@asyncapi/specs": "6.11.1"
