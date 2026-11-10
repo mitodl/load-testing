@@ -26,3 +26,6 @@ repos:
           - "yarn\\.lock"
           - --exclude-files
           - "learn/backend/client/"
+        # The generated baseline declares filters.gibberish.should_exclude_secret,
+        # which needs this plugin importable in the hook's environment.
+        additional_dependencies: ["gibberish-detector"]
