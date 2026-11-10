@@ -1,9 +1,10 @@
 repos:
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.6.1"
+    # The tag ships the matching biome, so no additional_dependencies pin is
+    # needed; keep it in step with the @biomejs/biome devDependency.
+    rev: "v2.6.6"
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@2.6.6"]
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.14.1-1
     hooks:

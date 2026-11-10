@@ -1,4 +1,8 @@
 ---
+# Linting, formatting and secret scanning run in autofix.yml via prek.
+# This workflow covers what is specific to a k6 repository: the scripts have no
+# unit tests, so the check that they are not broken is that k6 can compile and
+# bundle each entrypoint.
 name: CI
 
 on:
@@ -10,36 +14,39 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  check:
+  scripts-compile:
+    name: scripts compile
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: "^24.0.0"
-          cache: yarn
-          cache-dependency-path: yarn.lock
+          persist-credentials: false
 
-      - name: Install
-        run: yarn install --immutable
+      - uses: grafana/setup-k6-action@c47136d33d365efbeb9ae7266908b5dcf98cdece # v1.3.0
 
-      - name: Lint and format
-        run: yarn biome ci
-
-      - name: Install k6
-        uses: grafana/setup-k6-action@c47136d33d365efbeb9ae7266908b5dcf98cdece # v1.3.0
-
-      # Compiles each entrypoint and resolves every import without sending a
-      # single request. No load is generated against any environment.
-      - name: Check scripts compile
+      # `k6 archive` transpiles each entrypoint and resolves every import,
+      # including the remote jslib modules, without issuing a single request.
+      # No load is generated against any environment.
+      - name: Compile every entrypoint
         run: |
+          status=0
           for f in learn/learn.smoke.ts \
                    learn/learn.average-load.ts \
                    learn/learn.stress.ts \
                    learn/channels.compare.ts; do
             echo "::group::$f"
-            k6 archive "$f" -O /dev/null
+            if k6 archive "$f" -O /dev/null; then
+              echo "ok"
+            else
+              echo "::error file=$f::k6 could not compile $f"
+              status=1
+            fi
             echo "::endgroup::"
           done
+          exit "$status"
