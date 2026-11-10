@@ -1,15 +1,15 @@
-import { check } from "k6"
-import { browser, Page } from "k6/browser"
 import {
   randomIntBetween,
   randomItem,
 } from "https://jslib.k6.io/k6-utils/1.2.0/index.js"
+import { check } from "k6"
+import { browser, type Page } from "k6/browser"
+import { type AuthCredential, credentials } from "../auth.ts"
 import {
   BROWSER_CONTEXT_OPTIONS,
   FRONTEND_BASE_URL,
   SSO_BASE_URL,
 } from "../config.ts"
-import { AuthCredential, credentials } from "../auth.ts"
 import { escapeRegex } from "../utils.ts"
 
 type Context = {
@@ -104,10 +104,10 @@ async function login(page: Page, context: Context) {
 const ESCAPED_SSO_URL = escapeRegex(SSO_BASE_URL)
 
 const KEYCLOAK_USERNAME_URL_RE = new RegExp(
-  `${ESCAPED_SSO_URL}\/realms\/[a-z-]+\/protocol\/openid-connect\/auth.*`,
+  `${ESCAPED_SSO_URL}/realms/[a-z-]+/protocol/openid-connect/auth.*`,
 )
 const KEYCLOAK_PASSWORD_URL_RE = new RegExp(
-  `${ESCAPED_SSO_URL}\/realms\/[a-z-]+\/login-actions\/authenticate.*`,
+  `${ESCAPED_SSO_URL}/realms/[a-z-]+/login-actions/authenticate.*`,
 )
 
 async function loginKeycloak(

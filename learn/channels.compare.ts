@@ -1,5 +1,5 @@
-import { IGNORE_HTTPS_ERRORS, BACKEND_BASE_URL } from "./config.ts"
 import { discoverChannels, testChannels } from "./backend/channels.ts"
+import { BACKEND_BASE_URL, IGNORE_HTTPS_ERRORS } from "./config.ts"
 
 export { testChannels }
 

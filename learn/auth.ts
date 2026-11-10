@@ -31,7 +31,7 @@ function _validate_credentials(credentials) {
 
 export const credentials: AuthCredential[] = new SharedArray(
   "credentials",
-  function () {
+  () => {
     if (!__ENV.USERS_JSON_FILE) {
       return []
     }

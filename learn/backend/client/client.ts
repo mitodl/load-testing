@@ -1,8 +1,8 @@
-import { Params } from "k6/http"
+import type { Params } from "k6/http"
+import { getAccessToken } from "../../auth.ts"
 import { BACKEND_BASE_URL } from "../../config.ts"
 import { MITLearnAPIClient as V0Client } from "./v0/api.ts"
 import { MITLearnAPIClient as V1Client } from "./v1/api.ts"
-import { getAccessToken } from "../../auth.ts"
 
 function getCommonRequestParameters(
   extraHeaders: Record<string, string> = {},
@@ -11,7 +11,7 @@ function getCommonRequestParameters(
 
   return {
     headers: {
-      ...(!!accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...extraHeaders,
     },
   }

@@ -13,5 +13,9 @@
     "strict": false
   },
   "include": ["learn/**/*.ts", "types/**/*.d.ts"],
-  "exclude": ["node_modules", "learn/backend/client/v0", "learn/backend/client/v1"]
+  "exclude": [
+    "node_modules",
+    "learn/backend/client/v0",
+    "learn/backend/client/v1"
+  ]
 }

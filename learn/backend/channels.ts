@@ -1,6 +1,6 @@
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js"
 import { check, fail } from "k6"
 import { Trend } from "k6/metrics"
-import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js"
 
 import { createV0Client } from "./client/client.ts"
 

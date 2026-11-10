@@ -1,18 +1,17 @@
+import {
+  randomIntBetween,
+  randomItem,
+} from "https://jslib.k6.io/k6-utils/1.2.0/index.js"
 import { check, group } from "k6"
 import exec from "k6/execution"
-import {
-  randomItem,
-  randomIntBetween,
-} from "https://jslib.k6.io/k6-utils/1.2.0/index.js"
-
-import { createV0Client, createV1Client } from "./client/client.ts"
-import { NewsEventsListParams } from "./client/v0/api.schemas.ts"
-import { FeaturedListParams } from "./client/v1/api.schemas.ts"
 import { hasAccessToken } from "../auth.ts"
+import { createV0Client, createV1Client } from "./client/client.ts"
+import type { NewsEventsListParams } from "./client/v0/api.schemas.ts"
+import type { FeaturedListParams } from "./client/v1/api.schemas.ts"
 
 export function testBackend() {
-  group("api", function () {
-    group("v0", function () {
+  group("api", () => {
+    group("v0", () => {
       exec.vu.metrics.tags.apiVersion = "v0"
 
       const client = createV0Client()
@@ -34,7 +33,7 @@ export function testBackend() {
         })
       })
 
-      group("news", function () {
+      group("news", () => {
         ;[
           {
             feed_type: "news",
@@ -60,12 +59,12 @@ export function testBackend() {
       delete exec.vu.metrics.tags.apiVersion
     })
 
-    group("v1", function () {
+    group("v1", () => {
       exec.vu.metrics.tags.apiVersion = "v1"
 
       const client = createV1Client()
 
-      group("learning resources", function () {
+      group("learning resources", () => {
         const res = client.learningResourcesList({ limit: 50 })
         const results = res.response.json("results")
         check(res, {
