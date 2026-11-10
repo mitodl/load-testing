@@ -1,41 +1,86 @@
-## k6 load testing
+# load-testing
 
-### Usage (Docker)
+[k6](https://grafana.com/docs/k6/latest/) load tests for MIT Open Learning
+properties. Each property lives in its own directory; today that is
+[`learn/`](learn/), covering MIT Learn's API and frontend.
 
-```shell
-./scripts/k6.sh /app/learn.smoke.ts -e BACKEND_BASE_URL=#### -e FRONTEND_BASE_URL=####
-```
+## Running
 
-### Usage (local k6)
-
-- Install [k6](https://grafana.com/docs/k6/latest/set-up/install-k6/)
+With k6 installed locally:
 
 ```shell
-k6 run learn.smoke.ts -e BACKEND_BASE_URL=#### -e FRONTEND_BASE_URL=####
+k6 run learn/learn.smoke.ts -e BACKEND_BASE_URL=#### -e FRONTEND_BASE_URL=####
 ```
 
-### Available tests
+Or in Docker, which needs no local k6 and brings its own browser. The repo root
+is mounted at `/app`, so scripts are addressed by their path within it:
 
-**Note: the numbers for average-load/stress should be updated over time**
+```shell
+./scripts/k6.sh /app/learn/learn.smoke.ts -e BACKEND_BASE_URL=#### -e FRONTEND_BASE_URL=####
+```
 
-- `learn.smoke.ts` - for lightweight smoke testing of deployments (4 users)
-- `learn.average-load.ts` - simulates an average amount of user load (100 users)
-- `learn.stress.ts` - simulates a stressful amount of user load (200 users)
+To check that a script compiles and all its imports resolve without sending any
+traffic:
 
-### Environment Variables
+```shell
+k6 archive learn/learn.smoke.ts
+```
 
-**Note: for base urls, if you access the services via a port, include the port number**
+## Available tests
 
-| Name                  | Decription                                                                                                                                                                                  | Example value                 |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `BACKEND_BASE_URL`    | The base url to the backend API service.                                                                                                                                                    | `https://api.learn.odl.local` |
-| `FRONTEND_BASE_URL`   | The base url to the frontend service.                                                                                                                                                       | `https://learn.odl.local`     |
-| `SSO_BASE_URL`        | The base url to the keycloak service.                                                                                                                                                       | `https://keycloak.odl.local`  |
-| `IGNORE_HTTPS_ERRORS` | Ignore https certificate errors. Only recommemded for local test certificates.                                                                                                              | `true`                        |
-| `USERS_JSON_FILE`     | Data file for users auth info. Expected to be in the format `[{"email": "<EMAIL>", "password": "<PASSWORD>"}, ...]`. Put this is the `data/` subdirectory as files in there are gitignored. | `data/users.json`             |
+**The numbers for average-load and stress should be revisited over time.**
 
-### channels.compare.ts
+| Script | Purpose |
+| --- | --- |
+| `learn/learn.smoke.ts` | Lightweight smoke testing of deployments (4 users) |
+| `learn/learn.average-load.ts` | An average amount of user load (100 users) |
+| `learn/learn.stress.ts` | A stressful amount of user load (200 users) |
+| `learn/channels.compare.ts` | Per-endpoint timings for the channels API, for comparing two runs |
 
-- `CHANNEL_NAME_PREFIX` (optional): if set, the channels load test only targets
-  channels whose names start with this prefix.
-  Example: `CHANNEL_NAME_PREFIX=loadtest-`
+Each of the first three splits its virtual users evenly between a backend API
+scenario and a browser scenario driving the frontend.
+
+## Environment variables
+
+**For base URLs, include the port number if you reach the service through one.**
+
+| Name | Description | Example |
+| --- | --- | --- |
+| `BACKEND_BASE_URL` | Base URL of the backend API service. | `https://api.learn.odl.local` |
+| `FRONTEND_BASE_URL` | Base URL of the frontend service. | `https://learn.odl.local` |
+| `SSO_BASE_URL` | Base URL of the Keycloak service. | `https://keycloak.odl.local` |
+| `IGNORE_HTTPS_ERRORS` | Ignore HTTPS certificate errors. Only for local test certificates. | `true` |
+| `USERS_JSON_FILE` | Credentials for the browser login journey, as `[{"email": "<EMAIL>", "password": "<PASSWORD>"}, ...]`. Resolved relative to the script, so put it under `learn/data/`, which is gitignored. | `data/users.json` |
+| `AUTH_ACCESS_TOKEN` | Bearer token for the backend API scenario. Without it, authenticated API checks are skipped. | |
+
+`channels.compare.ts` additionally takes `VUS` (default `15`), `DURATION`
+(default `3m`), `RUN_LABEL` (default `run`, names the output file) and
+`CHANNEL_NAME_PREFIX`, which narrows the test to channels whose names start with
+the given prefix.
+
+**Credentials are secrets and this repository is public.** `learn/data/` is
+gitignored for that reason — keep credential files there and nowhere else.
+
+## Regenerating the API clients
+
+`learn/backend/client/v0` and `v1` are generated by
+[`@grafana/openapi-to-k6`](https://github.com/grafana/openapi-to-k6) from MIT
+Learn's published OpenAPI schema. Do not edit them by hand:
+
+```shell
+./scripts/generate-from-openapi.sh
+```
+
+Set `LEARN_API_BASE_URL` to generate against a deployment other than production.
+
+## Development
+
+```shell
+yarn install
+yarn lint        # biome
+yarn typecheck   # see the note below
+```
+
+`yarn typecheck` currently reports 24 pre-existing errors — 15 in generated
+client code, from an `openapi-to-k6` output bug, and 9 in `learn/backend/test.ts`,
+which treats `JSONValue` as an array. CI does not gate on it yet.
