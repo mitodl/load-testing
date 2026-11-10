@@ -17,11 +17,11 @@
     "generate-clients": "./scripts/generate-from-openapi.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.1",
-    "@grafana/openapi-to-k6": "^0.4.1",
+    "@biomejs/biome": "2.6.6",
+    "@grafana/openapi-to-k6": "0.4.1",
     "@j178/prek": "0.5.10",
-    "@types/k6": "^1.7.0",
-    "typescript": "^5.9.3"
+    "@types/k6": "1.7.0",
+    "typescript": "5.9.3"
   },
   "resolutions": {
     "@asyncapi/specs": "6.11.1"
