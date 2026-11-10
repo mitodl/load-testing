@@ -72,7 +72,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:^2.5.1":
+"@biomejs/biome@npm:2.6.6":
   version: 2.6.6
   resolution: "@biomejs/biome@npm:2.6.6"
   dependencies:
@@ -401,7 +401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/openapi-to-k6@npm:^0.4.1":
+"@grafana/openapi-to-k6@npm:0.4.1":
   version: 0.4.1
   resolution: "@grafana/openapi-to-k6@npm:0.4.1"
   dependencies:
@@ -1115,7 +1115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/k6@npm:^1.0.0, @types/k6@npm:^1.7.0":
+"@types/k6@npm:1.7.0, @types/k6@npm:^1.0.0":
   version: 1.7.0
   resolution: "@types/k6@npm:1.7.0"
   checksum: 10c0/d8de78a7f90acf3906cf8414dc88eba181cea8768b6cb4096fad24f8efd3eb6def8f8d119f3416406cb0e7691c1ef8853abe26ffe6814bd331d3e048fa85d189
@@ -2708,11 +2708,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "load-testing@workspace:."
   dependencies:
-    "@biomejs/biome": "npm:^2.5.1"
-    "@grafana/openapi-to-k6": "npm:^0.4.1"
+    "@biomejs/biome": "npm:2.6.6"
+    "@grafana/openapi-to-k6": "npm:0.4.1"
     "@j178/prek": "npm:0.5.10"
-    "@types/k6": "npm:^1.7.0"
-    typescript: "npm:^5.9.3"
+    "@types/k6": "npm:1.7.0"
+    typescript: "npm:5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -3820,7 +3820,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.9.3":
+"typescript@npm:5.9.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -3830,7 +3830,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.9.3#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:
