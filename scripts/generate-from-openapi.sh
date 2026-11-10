@@ -83,6 +83,9 @@ if [[ ! -x ${K6} ]]; then
 	if [[ ${ACTUAL} != "${SHA256}" ]]; then
 		rm -f "${ARCHIVE}"
 		echo "Checksum mismatch for ${ARCHIVE}: expected ${SHA256}, got ${ACTUAL}." >&2
+		echo "If XK6_OPENAPI_VERSION was just bumped, refresh all four digests:" >&2
+		echo "  gh api repos/grafana/xk6-subcommand-openapi/releases/tags/${XK6_OPENAPI_VERSION} \\" >&2
+		echo "    --jq '.assets[] | \"\\(.name) \\(.digest | sub(\"^sha256:\"; \"\"))\"'" >&2
 		exit 1
 	fi
 

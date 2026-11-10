@@ -10,5 +10,19 @@
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>\\S+?)\\s+XK6_OPENAPI_VERSION=(?<currentValue>\\S+)"
       ]
     }
+  ],
+  "packageRules": [
+    {
+      "description": "A bump here carries stale asset digests, which only a human can refresh, so it must not automerge",
+      "matchDepNames": ["grafana/xk6-subcommand-openapi"],
+      "automerge": false,
+      "prBodyNotes": [
+        "The four `SHA256=` constants in `scripts/generate-from-openapi.sh` still belong to the previous version and this pull request cannot compute the new ones. Refresh all four before merging, or `yarn generate-clients` stops at a checksum mismatch:",
+        "```sh",
+        "gh api repos/grafana/xk6-subcommand-openapi/releases/tags/{{{newValue}}} \\",
+        "  --jq '.assets[] | \"\\(.name) \\(.digest | sub(\"^sha256:\"; \"\"))\"'",
+        "```"
+      ]
+    }
   ]
 }
