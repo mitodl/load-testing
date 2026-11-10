@@ -10,3 +10,7 @@ learn/data/*
 
 # handleSummary() output, written to /app/results inside the k6 container
 results/
+
+# Cached k6 binary with the openapi subcommand extension, fetched by
+# scripts/generate-from-openapi.sh
+.cache/

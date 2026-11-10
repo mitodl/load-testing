@@ -28,12 +28,12 @@ type DiscoveredChannel = {
  * Discover real channel type/name/id values once, before the load ramps.
  * Runs in k6 setup() where http is allowed.
  */
-export function discoverChannels(baseUrl: string): {
+export async function discoverChannels(baseUrl: string): Promise<{
   channels: DiscoveredChannel[]
   channelTypes: string[]
-} {
+}> {
   const client = createV0Client()
-  const res = client.channelsList({ limit: 100 })
+  const res = await client.channelsList({ query: { limit: 100 } })
   const results = res.response.json("results") as DiscoveredChannel[]
   if (!results || results.length === 0) {
     fail("channels discovery returned no results")
@@ -68,9 +68,9 @@ function record(endpoint: Endpoint, res) {
   })
 }
 
-const tags = (endpoint: Endpoint) => ({ tags: { endpoint } })
+const at = (endpoint: Endpoint) => ({ k6Params: { tags: { endpoint } } })
 
-export function testChannels(data: {
+export async function testChannels(data: {
   channels: DiscoveredChannel[]
   channelTypes: string[]
 }) {
@@ -81,25 +81,25 @@ export function testChannels(data: {
 
   record(
     "channels_list",
-    client.channelsList({ limit: 50 }, tags("channels_list")),
+    await client.channelsList({ query: { limit: 50 }, ...at("channels_list") }),
   )
 
   record(
     "channels_type_retrieve",
-    client.channelsTypeRetrieve(
+    await client.channelsTypeRetrieve(
       channel.channel_type,
       channel.name,
-      tags("channels_type_retrieve"),
+      at("channels_type_retrieve"),
     ),
   )
 
   record(
     "channels_retrieve",
-    client.channelsRetrieve(channel.id, tags("channels_retrieve")),
+    await client.channelsRetrieve(channel.id, at("channels_retrieve")),
   )
 
   record(
     "channels_counts_list",
-    client.channelsCountsList(channelType, tags("channels_counts_list")),
+    await client.channelsCountsList(channelType, at("channels_counts_list")),
   )
 }

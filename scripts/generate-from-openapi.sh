@@ -15,10 +15,74 @@ ROOT_DIR=$(dirname "${SCRIPT_DIR}")
 
 LEARN_API_BASE_URL="${LEARN_API_BASE_URL:-https://api.learn.mit.edu}"
 
+# `k6 x openapi` is a subcommand extension, so generating needs a k6 built with
+# it. Only generating does: the client written below is plain TypeScript that
+# runs on a stock k6.
+XK6_OPENAPI_VERSION=v0.1.0
+
+# The release publishes no checksum file, so these digests come from the GitHub
+# API. Refresh them alongside the version:
+#   gh api repos/grafana/xk6-subcommand-openapi/releases/tags/${XK6_OPENAPI_VERSION} \
+#     --jq '.assets[] | "\(.name) \(.digest)"'
+case "$(uname -s)-$(uname -m)" in
+Linux-x86_64)
+	PLATFORM=linux_amd64
+	SHA256=309a6ed0822a6afadf9a29b52c574ddbded90b74dd85f558521a713e1a181521
+	;;
+Linux-aarch64 | Linux-arm64)
+	PLATFORM=linux_arm64
+	SHA256=fcdb938e49715ab38b2f99d06a3120a3ac057ae548fe8fd92cf13fa64cde68f8
+	;;
+Darwin-x86_64)
+	PLATFORM=darwin_amd64
+	SHA256=473f7fc54774ec7e055df0e8b460aad52b0545a31664da9c1895adda49fc90f1
+	;;
+Darwin-arm64)
+	PLATFORM=darwin_arm64
+	SHA256=65e068788ac307e0acc8a5a5a5bbc0f968ee74ff6a18bafd35032811a331cc0b
+	;;
+*)
+	echo "xk6-subcommand-openapi publishes no build for $(uname -s)-$(uname -m)." >&2
+	exit 1
+	;;
+esac
+
+sha256_of() {
+	if command -v sha256sum &>/dev/null; then
+		sha256sum "$1" | cut -d' ' -f1
+	else
+		shasum -a 256 "$1" | cut -d' ' -f1
+	fi
+}
+
 cd "${ROOT_DIR}"
 
+CACHE_DIR=".cache/k6-openapi/${XK6_OPENAPI_VERSION}"
+K6="${CACHE_DIR}/xk6-subcommand-openapi_${XK6_OPENAPI_VERSION}_${PLATFORM}/k6"
+
+if [[ ! -x ${K6} ]]; then
+	ARCHIVE="${CACHE_DIR}/${PLATFORM}.tar.gz"
+	URL="https://github.com/grafana/xk6-subcommand-openapi/releases/download/${XK6_OPENAPI_VERSION}/xk6-subcommand-openapi_${XK6_OPENAPI_VERSION}_${PLATFORM}.tar.gz"
+
+	mkdir -p "${CACHE_DIR}"
+	echo "Fetching ${URL}"
+	curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
+
+	ACTUAL=$(sha256_of "${ARCHIVE}")
+	if [[ ${ACTUAL} != "${SHA256}" ]]; then
+		echo "Checksum mismatch for ${ARCHIVE}: expected ${SHA256}, got ${ACTUAL}." >&2
+		exit 1
+	fi
+
+	tar -xzf "${ARCHIVE}" -C "${CACHE_DIR}"
+	rm -f "${ARCHIVE}"
+fi
+
+# Each descriptor construct the generator skips or approximates is logged as a
+# warning on stderr, so read the output rather than only the exit status.
 for version in v0 v1; do
-	npx @grafana/openapi-to-k6 --mode split \
+	mkdir -p "learn/backend/client/${version}"
+	"${K6}" x openapi \
 		"${LEARN_API_BASE_URL}/api/${version}/schema/" \
-		"learn/backend/client/${version}/api.ts"
+		--out "learn/backend/client/${version}/api.ts"
 done

@@ -22,7 +22,7 @@ export function createV0Client(
 ): V0Client {
   return new V0Client({
     baseUrl: BACKEND_BASE_URL,
-    commonRequestParameters: getCommonRequestParameters(extraHeaders),
+    commonK6Params: getCommonRequestParameters(extraHeaders),
   })
 }
 export function createV1Client(
@@ -30,6 +30,6 @@ export function createV1Client(
 ): V1Client {
   return new V1Client({
     baseUrl: BACKEND_BASE_URL,
-    commonRequestParameters: getCommonRequestParameters(extraHeaders),
+    commonK6Params: getCommonRequestParameters(extraHeaders),
   })
 }

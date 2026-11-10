@@ -18,12 +18,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
-    "@grafana/openapi-to-k6": "0.4.1",
     "@j178/prek": "0.5.10",
     "@types/k6": "2.3.1",
     "typescript": "7.0.2"
-  },
-  "resolutions": {
-    "@asyncapi/specs": "6.11.1"
   }
 }
