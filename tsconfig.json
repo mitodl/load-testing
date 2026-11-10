@@ -1,5 +1,17 @@
 {
   "compilerOptions": {
-    "exclude": ["**/*"]
-  }
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["k6"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false
+  },
+  "include": ["learn/**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "learn/backend/client/v0", "learn/backend/client/v1"]
 }
