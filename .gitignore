@@ -1,0 +1,12 @@
+node_modules/
+
+.yarn/*
+!.yarn/releases
+
+# Credential files for the load tests: learn/auth.ts reads USERS_JSON_FILE from
+# here, as [{"email": ..., "password": ...}, ...]. This repo is public.
+learn/data/*
+!learn/data/.keep
+
+# handleSummary() output, written to /app/results inside the k6 container
+results/
