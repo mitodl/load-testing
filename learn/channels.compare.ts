@@ -23,8 +23,8 @@ export const options = {
   insecureSkipTLSVerify: IGNORE_HTTPS_ERRORS,
 }
 
-export function setup() {
-  return discoverChannels(BACKEND_BASE_URL)
+export async function setup() {
+  return await discoverChannels(BACKEND_BASE_URL)
 }
 
 export function handleSummary(data) {
