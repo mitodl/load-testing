@@ -5,7 +5,9 @@
     {
       "customType": "regex",
       "description": "The k6 openapi generator is pinned in the generator script, not in a lockfile, so no language manager sees it",
-      "fileMatch": ["(^|/)scripts/generate-from-openapi\\.sh$"],
+      "managerFilePatterns": [
+        "/(^|/)scripts/generate-from-openapi\\.sh$/"
+      ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>\\S+?)\\s+XK6_OPENAPI_VERSION=(?<currentValue>\\S+)"
       ]
