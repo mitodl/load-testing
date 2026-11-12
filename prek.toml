@@ -1,0 +1,67 @@
+# prek.toml — pre-commit hook configuration
+# Docs: https://prek.j178.dev
+#
+# Install hooks:      prek install
+# Run on all files:   prek run --all-files
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+# The tag ships the matching biome, so no additional_dependencies pin is needed;
+# keep it in step with the @biomejs/biome devDependency.
+repo = "https://github.com/biomejs/pre-commit"
+rev = "v2.6.6"
+hooks = [{ id = "biome-check" }]
+
+[[repos]]
+repo = "https://github.com/scop/pre-commit-shfmt"
+rev = "v3.14.1-1"
+hooks = [{ id = "shfmt" }]
+
+[[repos]]
+repo = "https://github.com/shellcheck-py/shellcheck-py"
+rev = "v0.11.0.1-1"
+hooks = [{ id = "shellcheck", args = ["--severity=warning"] }]
+
+# ── Secrets: gitleaks ─────────────────────────────────────────────────────────
+# Three registrations of one hook, because each covers a gap the others leave.
+# Exclusions live in .gitleaks.toml, plus .gitleaks-tree.toml for the one hook
+# that reads the filesystem instead of git; see the headers there.
+#
+# `gitleaks` reads the staged index, which is what a commit is about to add. It
+# is empty under `prek run --all-files`, where this hook passes having scanned
+# nothing, so the two below carry the weight everywhere except a commit.
+#
+# `gitleaks-tree` reads the working tree, so `prek run --all-files` scans real
+# bytes — locally, in the autofix passes, and on a push to the default branch,
+# where the pull-request step does not run. This is the whole-file coverage
+# detect-secrets provided.
+#
+# `gitleaks-pr` reads the commits a pull request adds, catching a secret that
+# was committed and then deleted, which no tree scan can see. Manual stage, so
+# the commit hook and `--all-files` skip it and the workflow invokes it. It
+# needs origin/main and full history, which the workflow fetches.
+#
+# `--pre-commit=false` and `--staged=false` cancel the flags baked into the
+# hook's entry, since the last occurrence wins. Both are required: cmd/git.go
+# branches on `if preCommit || staged` into a diff scan that never reads
+# --log-opts.
+
+[[repos]]
+repo = "https://github.com/gitleaks/gitleaks"
+rev = "v8.30.1"
+
+[[repos.hooks]]
+id = "gitleaks"
+
+[[repos.hooks]]
+id = "gitleaks"
+alias = "gitleaks-tree"
+name = "Detect hardcoded secrets in the working tree"
+entry = "gitleaks dir . --config .gitleaks-tree.toml --redact --no-banner --verbose"
+
+[[repos.hooks]]
+id = "gitleaks"
+alias = "gitleaks-pr"
+name = "Detect hardcoded secrets in the commits a PR adds"
+stages = ["manual"]
+args = ["--pre-commit=false", "--staged=false", "--log-opts=--no-merges origin/main..HEAD"]

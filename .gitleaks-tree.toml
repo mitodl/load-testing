@@ -1,0 +1,21 @@
+# gitleaks configuration for the gitleaks-tree hook only.
+#
+# `gitleaks dir` walks the filesystem and does not read .gitignore, so it would
+# otherwise open files git never sees. These two paths are gitignored and hold
+# working-tree data, so the scan skips them during the walk. They are
+# deliberately absent from .gitleaks.toml: in the git-mode hooks their
+# appearance means something gitignored got committed, which must fail.
+
+# useDefault is not set here: gitleaks refuses a config that sets both it and
+# path. The default ruleset arrives through .gitleaks.toml, which does set it.
+[extend]
+path = ".gitleaks.toml"
+
+[[allowlists]]
+description = "Gitignored working-tree data that `gitleaks dir` would otherwise read"
+paths = [
+  # Real load-test credentials. This repository is public; see README.
+  '''^learn/data/''',
+  # k6 handleSummary() output.
+  '''^results/''',
+]

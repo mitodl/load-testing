@@ -7,6 +7,9 @@
 #
 # The repository pins "@j178/prek" to an exact version in devDependencies. The install step
 # below also provides node_modules for local `language: node` hooks such as eslint and prettier.
+#
+# load-testing keeps its hook config in prek.toml (not .pre-commit-config.yaml), so the
+# prek cache below is keyed on that file.
 name: autofix.ci # autofix.ci refuses to run under any other name
 on:
   pull_request:
@@ -26,6 +29,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false # ADAPT: private repositories delete this block (contract §3.1)
+          fetch-depth: 0 # gitleaks-pr scans origin/main..HEAD, which needs history
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "26.13.0" # ADAPT: use node-version-file if the repository pins Node
@@ -53,7 +57,12 @@ jobs:
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/prek
-          key: prek-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: prek-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('prek.toml') }}
+          # gitleaks is a `language: golang` hook, so a cold miss downloads a Go
+          # toolchain and builds it from source. Reuse the last cache on a prek.toml
+          # edit and let prek install only what changed.
+          restore-keys: |
+            prek-${{ runner.os }}-${{ runner.arch }}-
       # ADAPT: toolchains for local hooks go here, installed from lockfiles or exact pins.
       # See the playbook's "Toolchains" section (Node, packer, the project environment).
       - name: Tree is clean before hooks run
@@ -70,6 +79,12 @@ jobs:
       - name: prek (must converge)
         id: converge
         run: prek run --all-files --show-diff-on-failure --color=always
+      - name: Secret scan of the commits this pull request adds
+        id: gitleaks-pr
+        if: github.event_name == 'pull_request'
+        # The passes above scan the working tree via gitleaks-tree; this catches a secret
+        # that was committed and then deleted, which no tree scan can see.
+        run: prek run --stage manual --all-files gitleaks-pr --color=always
       - name: Default branch has no fixable drift
         id: no-drift
         if: github.event_name != 'pull_request'
