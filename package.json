@@ -17,8 +17,8 @@
     "generate-clients": "./scripts/generate-from-openapi.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
-    "@j178/prek": "0.5.10",
+    "@biomejs/biome": "2.6.8",
+    "@j178/prek": "0.5.11",
     "@types/k6": "2.3.1",
     "typescript": "7.0.2"
   }
